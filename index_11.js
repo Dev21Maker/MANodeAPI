@@ -7,8 +7,10 @@ function delay(time) {
     });
 }
 
-module.exports = {
-    call: callUizard(),
+module.exports = async (req, res) => {
+    let func = await callUizard();
+    res.setHeader('Content-Type', 'image/png')
+    res.send(func);
 };
 
 const startX = 10;
@@ -22,7 +24,9 @@ async function callUizard() {
     try {
         // (async () => {
         const browser = await puppeteer.launch({
-            headless: false,
+            executablePath: puppeteer.executablePath(),
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            // headless: false,
             // executablePath: "C:/Users/barto/Downloads/chrome-win/chrome-win/chrome.exe"
         })
         const page = await browser.newPage()
@@ -132,10 +136,12 @@ async function callUizard() {
 
         // await page.click("#prototype-editor-container > div.PrototypeEditorstyles__Main-sc-19wpwuq-2.dVmrDU > div.RightControlsContentstyles__Container-sc-1ekh74n-0.kFXSuS > div > div.CanvasSidebarstyles__ViewContainer-sc-1ey6e25-0.bYNwM > div > div > div > div > div.ExportOptionsstyles__Container-sc-1n35eqo-3.hlmOXP > div > div > div.styles__Content-sc-7gdnot-3.TqlYF > div > div > div.ExportOptionsstyles__ExportButtonContainer-sc-1n35eqo-2.knGCJX > button")
 
+        const screenshot = await page.screenshot({encoding: 'binary'})
 
         // await delay(180000)
 
-        // await browser.close()
+        await browser.close()
+        return screenshot;
 
     } catch (e) {
         console.log(e)
